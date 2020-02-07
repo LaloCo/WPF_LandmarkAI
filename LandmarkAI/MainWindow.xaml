@@ -34,7 +34,7 @@
                 <GridView>
                     <GridViewColumn Header="Tag"
                                     Width="100"
-                                    DisplayMemberBinding="{Binding Tag}"/>
+                                    DisplayMemberBinding="{Binding TagName}"/>
                     <GridViewColumn Header="Probability"
                                     Width="100"
                                     DisplayMemberBinding="{Binding Path=Probability, StringFormat=P2}"/>

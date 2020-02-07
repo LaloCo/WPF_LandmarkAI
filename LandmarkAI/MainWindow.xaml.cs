@@ -47,13 +47,16 @@ namespace LandmarkAI
 
         private void URL_Button_Click(object sender, RoutedEventArgs e)
         {
-            selectedImage.Source = new BitmapImage(new Uri(urlTextBox.Text));
-            MakePredictionWithURLAsync(urlTextBox.Text);
+            if (!string.IsNullOrWhiteSpace(urlTextBox.Text))
+            {
+                selectedImage.Source = new BitmapImage(new Uri(urlTextBox.Text));
+                MakePredictionWithURLAsync(urlTextBox.Text);
+            }
         }
 
         private async void MakePredictionWithImageAsync(string fileName)
         {
-            string url = "https://southcentralus.api.cognitive.microsoft.com/customvision/v1.1/Prediction/61d83fd6-464d-4be3-a4b9-1f86d2e5ba5a/image?iterationId=22aac29e-e0d1-46e5-9b91-144c104e4fb4";
+            string url = "https://southcentralus.api.cognitive.microsoft.com/customvision/v3.0/Prediction/61d83fd6-464d-4be3-a4b9-1f86d2e5ba5a/classify/iterations/Iteration2/image";
             string prediction_key = "ce456cdb4d0044f58c8706bb588e4d0a";
             string content_type = "application/octet-stream";
             var file = File.ReadAllBytes(fileName);
@@ -77,7 +80,7 @@ namespace LandmarkAI
 
         private async void MakePredictionWithURLAsync(string imageUrl)
         {
-            string url = "https://southcentralus.api.cognitive.microsoft.com/customvision/v1.1/Prediction/61d83fd6-464d-4be3-a4b9-1f86d2e5ba5a/url?iterationId=22aac29e-e0d1-46e5-9b91-144c104e4fb4";
+            string url = "https://southcentralus.api.cognitive.microsoft.com/customvision/v3.0/Prediction/61d83fd6-464d-4be3-a4b9-1f86d2e5ba5a/classify/iterations/Iteration2/url";
             string prediction_key = "ce456cdb4d0044f58c8706bb588e4d0a";
             string content_type = "application/json";
             string body = $"{{\"Url\": \"{imageUrl}\"}}";
