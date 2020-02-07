@@ -30,7 +30,7 @@ namespace LandmarkAI
             InitializeComponent();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void Image_Button_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog();
             dialog.Filter = "Image files (*.png; *.jpg)|*.png;*.jpg;*jpeg|All files (*.*)|*.*";
@@ -41,14 +41,20 @@ namespace LandmarkAI
                 string fileName = dialog.FileName;
                 selectedImage.Source = new BitmapImage(new Uri(fileName));
 
-                MakePredictionAsync(fileName);
+                MakePredictionWithImageAsync(fileName);
             }
         }
 
-        private async void MakePredictionAsync(string fileName)
+        private void URL_Button_Click(object sender, RoutedEventArgs e)
         {
-            string url = "https://southcentralus.api.cognitive.microsoft.com/customvision/v1.1/Prediction/bf39d301-3888-43cf-91fe-1509ce5ac26a/image?iterationId=2cc8d120-36d9-417c-b3c3-213b910a3f20";
-            string prediction_key = "fd63926c323344a0aacaa249ebd73fc6";
+            selectedImage.Source = new BitmapImage(new Uri(urlTextBox.Text));
+            MakePredictionWithURLAsync(urlTextBox.Text);
+        }
+
+        private async void MakePredictionWithImageAsync(string fileName)
+        {
+            string url = "https://southcentralus.api.cognitive.microsoft.com/customvision/v1.1/Prediction/61d83fd6-464d-4be3-a4b9-1f86d2e5ba5a/image?iterationId=22aac29e-e0d1-46e5-9b91-144c104e4fb4";
+            string prediction_key = "ce456cdb4d0044f58c8706bb588e4d0a";
             string content_type = "application/octet-stream";
             var file = File.ReadAllBytes(fileName);
 
@@ -57,6 +63,30 @@ namespace LandmarkAI
                 client.DefaultRequestHeaders.Add("Prediction-Key", prediction_key);
 
                 using (var content = new ByteArrayContent(file))
+                {
+                    content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(content_type);
+                    var response = await client.PostAsync(url, content);
+
+                    var responseString = await response.Content.ReadAsStringAsync();
+
+                    List<Prediction> predictions = (JsonConvert.DeserializeObject<CustomVision>(responseString)).Predictions;
+                    predictionsListView.ItemsSource = predictions;
+                }
+            }
+        }
+
+        private async void MakePredictionWithURLAsync(string imageUrl)
+        {
+            string url = "https://southcentralus.api.cognitive.microsoft.com/customvision/v1.1/Prediction/61d83fd6-464d-4be3-a4b9-1f86d2e5ba5a/url?iterationId=22aac29e-e0d1-46e5-9b91-144c104e4fb4";
+            string prediction_key = "ce456cdb4d0044f58c8706bb588e4d0a";
+            string content_type = "application/json";
+            string body = $"{{\"Url\": \"{imageUrl}\"}}";
+
+            using (HttpClient client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Add("Prediction-Key", prediction_key);
+
+                using (var content = new StringContent(body, Encoding.UTF8, "application/json"))
                 {
                     content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(content_type);
                     var response = await client.PostAsync(url, content);
